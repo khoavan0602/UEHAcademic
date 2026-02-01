@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UEH Academic - Nền tảng Học thuật Số</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { ueh: { blue: '#005f69', teal: '#6AA2B8', gold: '#d97706', light: '#f0f9ff' } } }
+            }
+        }
+    </script>
+    <style>html {scroll-behavior: smooth;}</style>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen font-sans text-slate-800">
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{{ url_for('home') }}" class="flex items-center gap-2 group">
+                        <i class="fa-solid fa-graduation-cap text-3xl text-ueh-blue group-hover:text-ueh-gold transition"></i>
+                        <div><span class="font-extrabold text-2xl text-ueh-blue tracking-tighter">UEH</span><span class="block text-[10px] font-bold text-gray-500 tracking-widest">ACADEMIC</span></div>
+                    </a>
+                    <div class="hidden lg:ml-10 lg:flex lg:space-x-8">
+                        <a href="{{ url_for('home') }}" class="text-gray-900 px-3 py-2 rounded-md text-sm font-medium hover:text-ueh-blue">Trang chủ</a>
+                        <a href="{{ url_for('document_list') }}" class="text-gray-500 px-3 py-2 rounded-md text-sm font-medium hover:text-ueh-blue">Tài liệu</a>
+                        <a href="{{ url_for('competition_list') }}" class="text-gray-500 px-3 py-2 rounded-md text-sm font-medium hover:text-ueh-blue">Cuộc thi</a>
+                        <a href="{{ url_for('forum') }}" class="text-gray-500 px-3 py-2 rounded-md text-sm font-medium hover:text-ueh-blue">Diễn đàn</a>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    {% if user %}
+                        <div class="hidden sm:flex flex-col text-right"><span class="text-xs text-gray-500">Xin chào, <b>{{ user.name }}</b></span><span class="text-xs font-bold text-ueh-gold"><i class="fa-solid fa-star"></i> {{ user.points }} pts</span></div>
+                        <a href="{{ url_for('profile') }}" class="h-9 w-9 rounded-full bg-ueh-blue flex items-center justify-center text-white font-bold border border-ueh-teal hover:ring-2 hover:ring-ueh-gold transition">{{ user.avatar_initial }}</a>
+                        <a href="{{ url_for('logout') }}" class="text-gray-400 hover:text-red-600" title="Đăng xuất"><i class="fa-solid fa-right-from-bracket"></i></a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="text-sm font-bold text-gray-600 hover:text-ueh-blue">Đăng nhập</a>
+                        <a href="{{ url_for('register') }}" class="px-4 py-2 rounded-full text-sm font-bold text-white bg-ueh-blue hover:bg-ueh-teal shadow-md transition">Đăng ký</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="flex-grow">{% block content %}{% endblock %}</main>
+    <footer class="bg-slate-900 text-white py-10 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h3 class="font-bold text-xl mb-2 text-ueh-teal">UEH ACADEMIC</h3>
+            <p class="text-gray-400 text-sm mb-6">Kết nối tri thức - Kiến tạo tương lai</p>
+            <div class="flex justify-center gap-6 text-gray-400 text-sm">
+                <a href="{{ url_for('units_list') }}" class="hover:text-white transition">Về chúng tôi (Các đơn vị học thuật)</a>
+                <a href="#" class="hover:text-white transition">Quy định</a>
+                <a href="#" class="hover:text-white transition">Liên hệ</a>
+            </div>
+            <p class="text-xs text-gray-600 mt-8">© 2026 UEH Academic. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

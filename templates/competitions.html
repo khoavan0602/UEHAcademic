@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-8">
+            <form action="{{ url_for('competition_list') }}" method="GET" class="flex flex-col md:flex-row gap-4 items-end">
+                <div class="flex-grow w-full">
+                    <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Tìm đơn vị tổ chức</label>
+                    <input type="text" name="org_search" placeholder="VD: Khoa Tài chính, CLB..." class="w-full p-2 border rounded-lg text-sm outline-none focus:border-ueh-blue" value="{{ request.args.get('org_search', '') }}">
+                </div>
+                
+                <div class="w-full md:w-48">
+                    <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Tình trạng</label>
+                    <select name="status" class="w-full p-2 border rounded-lg text-sm outline-none">
+                        <option>Tất cả</option>
+                        <option {{ 'selected' if request.args.get('status') == 'Sắp diễn ra' }}>Sắp diễn ra</option>
+                        <option {{ 'selected' if request.args.get('status') == 'Đang diễn ra' }}>Đang diễn ra</option>
+                        <option {{ 'selected' if request.args.get('status') == 'Đã diễn ra' }}>Đã diễn ra</option>
+                    </select>
+                </div>
+
+                <div class="w-full md:w-64">
+                    <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Đơn vị tổ chức</label>
+                    <select name="org" class="w-full p-2 border rounded-lg text-sm outline-none">
+                        <option>Tất cả</option>
+                        {% for org in organizers %}
+                        <option {{ 'selected' if request.args.get('org') == org }}>{{ org }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="bg-ueh-blue text-white font-bold py-2 px-6 rounded-lg hover:bg-ueh-teal transition w-full md:w-auto">Lọc</button>
+            </form>
+        </div>
+
+        <h1 class="text-2xl font-bold text-gray-900 mb-6 border-l-4 border-ueh-gold pl-3">Danh sách cuộc thi</h1>
+        
+        <div class="grid gap-6">
+            {% for comp in competitions %}
+            <div class="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col md:flex-row gap-6 hover:shadow-lg transition">
+                <div class="w-full md:w-64 h-40 bg-gray-100 rounded-xl flex-shrink-0 overflow-hidden relative">
+                    <img src="{{ comp.image }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <div class="absolute top-2 left-2 bg-white/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold uppercase shadow-sm {{ 'text-green-600' if 'Sắp' in comp.status else 'text-blue-600' }}">{{ comp.status }}</div>
+                </div>
+                
+                <div class="flex-grow flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-ueh-blue transition"><a href="{{ url_for('competition_detail', id=comp.id) }}">{{ comp.name }}</a></h3>
+                        <p class="text-gray-600 text-sm mb-2 line-clamp-2">{{ comp.description }}</p>
+                        <div class="flex items-center gap-4 text-sm text-gray-500">
+                            <span><i class="fa-solid fa-building text-ueh-gold mr-1"></i> {{ comp.organizer }}</span>
+                            <span><i class="fa-regular fa-calendar mr-1"></i> {{ comp.date }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3 mt-4 pt-4 border-t border-gray-50">
+                        <a href="{{ url_for('competition_detail', id=comp.id) }}" class="bg-ueh-blue text-white font-bold py-2 px-6 rounded-lg text-sm hover:bg-ueh-teal transition shadow-sm">
+                            Xem chi tiết
+                        </a>
+                        <a href="{{ url_for('forum', type='competition', ref_id=comp.id) }}" class="bg-white border border-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg text-sm hover:bg-gray-50 transition flex items-center">
+                            <i class="fa-solid fa-comments mr-2 text-ueh-gold"></i> Forum cuộc thi
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-10 text-gray-500">Không tìm thấy cuộc thi nào.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

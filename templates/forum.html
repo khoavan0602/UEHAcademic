@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-gray-100 min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+                <i class="fa-brands fa-rocketchat text-ueh-gold mr-3"></i> Diễn đàn Sinh viên
+            </h1>
+            <div class="bg-white p-1 rounded-xl shadow-sm border border-gray-200 flex">
+                <a href="{{ url_for('forum', tab='exchange') }}" 
+                   class="px-6 py-2 rounded-lg text-sm font-bold transition {{ 'bg-ueh-blue text-white shadow' if current_tab == 'exchange' else 'text-gray-500 hover:bg-gray-50' }}">
+                   <i class="fa-solid fa-comments mr-2"></i> Diễn đàn Trao đổi
+                </a>
+                <a href="{{ url_for('forum', tab='academic') }}" 
+                   class="px-6 py-2 rounded-lg text-sm font-bold transition {{ 'bg-ueh-blue text-white shadow' if current_tab == 'academic' else 'text-gray-500 hover:bg-gray-50' }}">
+                   <i class="fa-solid fa-graduation-cap mr-2"></i> Diễn đàn Học thuật
+                </a>
+            </div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            
+            <div class="w-full lg:w-1/4">
+                <div class="bg-white rounded-xl shadow-sm p-6 sticky top-24 border border-gray-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-gray-800">Bộ lọc chủ đề</h3>
+                        <a href="{{ url_for('forum', tab=current_tab) }}" class="text-xs text-ueh-blue hover:underline">Xóa lọc</a>
+                    </div>
+
+                    {% if current_tab == 'exchange' %}
+                    <div class="space-y-1">
+                        <a href="{{ url_for('forum', tab='exchange', topic='all') }}" 
+                           class="block px-3 py-2 rounded-lg text-sm {{ 'bg-blue-50 text-ueh-blue font-bold' if not selected_topic or selected_topic == 'all' else 'text-gray-600 hover:bg-gray-50' }}">
+                           Tất cả chủ đề
+                        </a>
+                        {% for topic in exchange_topics %}
+                        <a href="{{ url_for('forum', tab='exchange', topic=topic) }}" 
+                           class="block px-3 py-2 rounded-lg text-sm {{ 'bg-blue-50 text-ueh-blue font-bold' if selected_topic == topic else 'text-gray-600 hover:bg-gray-50' }}">
+                           {{ topic }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if current_tab == 'academic' %}
+                    <div class="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                        <a href="{{ url_for('forum', tab='academic', club='all') }}" 
+                           class="block px-3 py-2 rounded-lg text-sm {{ 'bg-blue-50 text-ueh-blue font-bold' if not selected_club or selected_club == 'all' else 'text-gray-600 hover:bg-gray-50' }}">
+                           Tất cả Đơn vị
+                        </a>
+                        
+                        {% for key, category in ueh_clubs.items() %}
+                        <div>
+                            <h4 class="text-xs font-bold text-gray-400 uppercase mb-2 px-3">{{ category.name }}</h4>
+                            <div class="space-y-1 border-l-2 border-gray-100 ml-3 pl-2">
+                                {% for group in category.groups %}
+                                <a href="{{ url_for('forum', tab='academic', club=group) }}" 
+                                   class="block px-3 py-1.5 rounded-lg text-sm truncate transition {{ 'text-ueh-gold font-bold bg-yellow-50' if selected_club == group else 'text-gray-600 hover:text-ueh-blue hover:bg-gray-50' }}">
+                                   {{ group }}
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <button class="w-full mt-6 bg-ueh-blue text-white font-bold py-2 rounded-lg hover:bg-ueh-teal transition shadow-sm">
+                        <i class="fa-solid fa-pen mr-2"></i> Tạo bài viết mới
+                    </button>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-3/4">
+                <div class="bg-white rounded-xl shadow-sm p-4 mb-6 border border-gray-200 flex gap-4 items-center">
+                    <div class="w-10 h-10 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold">
+                        {{ user.avatar_initial if user else '?' }}
+                    </div>
+                    <input type="text" placeholder="Bạn muốn chia sẻ điều gì ở {{ 'Diễn đàn Trao đổi' if current_tab == 'exchange' else 'Diễn đàn Học thuật' }}?" 
+                           class="flex-grow bg-gray-100 rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ueh-blue transition">
+                </div>
+
+                <div class="space-y-4">
+                    {% for post in posts %}
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition cursor-pointer group">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full {{ post.bg }} text-white flex items-center justify-center font-bold">
+                                    {{ post.initial }}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 text-sm">{{ post.author }}</h4>
+                                    <p class="text-xs text-gray-500">
+                                        {{ post.time }} • 
+                                        {% if current_tab == 'exchange' %}
+                                            <span class="text-ueh-blue font-bold">{{ post.topic }}</span>
+                                        {% else %}
+                                            <span class="text-ueh-gold font-bold">{{ post.club }}</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <button class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-ellipsis"></i></button>
+                        </div>
+
+                        <h3 class="font-bold text-lg text-gray-900 mb-2 group-hover:text-ueh-blue transition">{{ post.title }}</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ post.content }}</p>
+
+                        <div class="flex items-center gap-2 mb-4">
+                            {% for tag in post.tags %}
+                            <span class="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded font-medium">#{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <div class="flex items-center gap-6 border-t border-gray-50 pt-4 text-sm font-bold text-gray-500">
+                            <button class="flex items-center gap-2 hover:text-ueh-blue hover:bg-blue-50 px-3 py-1 rounded transition">
+                                <i class="fa-regular fa-thumbs-up"></i> {{ post.likes }}
+                            </button>
+                            <button class="flex items-center gap-2 hover:text-ueh-blue hover:bg-blue-50 px-3 py-1 rounded transition">
+                                <i class="fa-regular fa-comment-dots"></i> {{ post.comments_count }} Bình luận
+                            </button>
+                            <button class="flex items-center gap-2 hover:text-ueh-blue hover:bg-blue-50 px-3 py-1 rounded transition">
+                                <i class="fa-solid fa-share"></i> Chia sẻ
+                            </button>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
+                        <i class="fa-regular fa-comments text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">Chưa có bài viết nào trong mục này.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

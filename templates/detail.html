@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-gray-100 min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-sm text-gray-500 mb-6 flex items-center gap-2"><a href="{{ url_for('document_list') }}" class="hover:text-ueh-blue">Tài liệu</a> / <span class="text-gray-800 font-bold truncate max-w-xs">{{ doc.title }}</span></div>
+        <div class="flex flex-col lg:flex-row gap-8">
+            <div class="w-full lg:w-3/4">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 flex justify-between items-start">
+                        <div>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase mb-2 inline-block {{ 'bg-green-100 text-green-700' if doc.source_type == 'Chính thống' else 'bg-gray-100 text-gray-600' }}">{{ doc.source_type }}</span>
+                            {% if doc.is_premium %}<span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase mb-2 inline-block bg-yellow-100 text-yellow-700 ml-2"><i class="fa-solid fa-crown mr-1"></i> Premium</span>{% endif %}
+                            <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ doc.title }}</h1>
+                            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500"><span class="font-bold text-ueh-blue">{{ doc.course }}</span><span>• {{ doc.pages }} trang</span><span>• Năm {{ doc.year }}</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="relative bg-gray-50 p-8 flex justify-center min-h-[800px]">
+                        <div class="bg-white shadow-lg w-full max-w-3xl p-10 mb-4 text-gray-800 text-sm leading-relaxed border border-gray-200">
+                            <h2 class="text-xl font-bold text-center mb-6 uppercase">{{ doc.title }}</h2>
+                            <p class="font-bold mb-2">Nội dung tóm tắt:</p>
+                            <ul class="list-disc pl-5 mb-6 space-y-2">
+                                {% for item in doc.content_preview %}
+                                <li>{{ item }}</li>
+                                {% endfor %}
+                            </ul>
+                            <div class="space-y-4 text-justify {{ 'blur-[2px] select-none opacity-60' if doc.is_premium else '' }}">
+                                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                                <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+                            </div>
+                        </div>
+                        
+                        {% if doc.is_premium %}
+                        <div class="absolute top-[350px] left-0 right-0 bottom-0 bg-gradient-to-b from-transparent to-white/95 backdrop-blur-[1px] z-10 flex flex-col items-center pt-20">
+                            <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md border border-gray-100 transform -translate-y-10">
+                                <div class="w-16 h-16 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4"><i class="fa-solid fa-lock"></i></div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">Tài liệu Premium</h3>
+                                <p class="text-gray-500 text-sm mb-6">Để xem toàn bộ nội dung và tải xuống, vui lòng nâng cấp tài khoản hoặc sử dụng điểm thưởng.</p>
+                                <button onclick="alert('Đã mở khóa bằng điểm thưởng!')" class="w-full bg-ueh-blue text-white font-bold py-3 rounded-xl shadow-lg hover:bg-ueh-teal transition mb-3">Mở khóa ngay (50 điểm)</button>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="w-full lg:w-1/4">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+                    <button onclick="alert('Đang tải xuống...')" class="w-full bg-ueh-blue text-white font-bold py-3 rounded-xl shadow hover:bg-ueh-teal transition mb-3 flex items-center justify-center gap-2"><i class="fa-solid fa-download"></i> Tải xuống</button>
+                    <button class="w-full border border-gray-300 text-gray-600 font-bold py-3 rounded-xl hover:bg-gray-50 transition flex items-center justify-center gap-2"><i class="fa-regular fa-bookmark"></i> Lưu tài liệu</button>
+                </div>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="font-bold text-gray-900 mb-4 text-sm uppercase border-l-4 border-ueh-gold pl-2">Tài liệu liên quan</h3>
+                    <div class="space-y-4">
+                        {% for r in related_docs %}
+                        <a href="{{ url_for('document_detail', id=r.id) }}" class="flex gap-3 group">
+                            <div class="w-12 h-16 bg-gray-100 rounded border border-gray-200 flex-shrink-0 overflow-hidden"><img src="{{ r.image }}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100"></div>
+                            <div><h4 class="font-bold text-xs text-gray-800 line-clamp-2 group-hover:text-ueh-blue leading-snug">{{ r.title }}</h4><div class="text-[10px] text-gray-400 mt-1">{{ r.rating }} <i class="fa-solid fa-star text-yellow-500"></i></div></div>
+                        </a>
+                        {% else %}
+                        <p class="text-xs text-gray-400 italic">Không có tài liệu liên quan.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

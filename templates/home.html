@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="relative bg-gradient-to-r from-teal-900 to-teal-700 h-[600px] flex items-center overflow-hidden">
+    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#fff 2px, transparent 2px); background-size: 30px 30px;"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 relative z-10 w-full grid md:grid-cols-2 gap-12 items-center">
+        <div class="text-center md:text-left text-white">
+            <span class="inline-block bg-yellow-500 text-xs font-bold px-3 py-1 rounded-full mb-6 animate-pulse shadow-md">TOP 501+ WORLDWIDE</span>
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight drop-shadow-lg">
+                Hệ Sinh Thái Học Tập <br/><span class="text-yellow-400">UEH ACADEMIC</span>
+            </h1>
+            <p class="text-lg text-teal-100 mb-10 max-w-lg mx-auto md:mx-0 font-light leading-relaxed">
+                Nền tảng chia sẻ giáo trình, đề thi và kinh nghiệm học tập chính thống dành riêng cho sinh viên Đại học Kinh tế TP.HCM.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <a href="#featured" class="bg-white text-teal-900 font-bold px-8 py-3 rounded-full shadow-lg hover:bg-gray-100 transition transform hover:-translate-y-1">Khám phá ngay</a>
+                <a href="{{ url_for('upload') }}" class="bg-yellow-500 text-white font-bold px-8 py-3 rounded-full shadow-lg hover:bg-yellow-600 transition transform hover:-translate-y-1">Chia sẻ tài liệu</a>
+            </div>
+        </div>
+        
+        <div class="hidden md:flex justify-center">
+            <div class="relative w-80 h-80">
+                <div class="absolute inset-0 bg-white/10 backdrop-blur-md rounded-full border border-white/20 animate-pulse"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="text-center transform rotate-3 hover:rotate-0 transition duration-500">
+                        <i class="fa-solid fa-graduation-cap text-9xl text-yellow-400 drop-shadow-2xl mb-4"></i>
+                        <div class="text-white font-bold text-2xl tracking-widest uppercase border-t border-white/30 pt-2 mt-2">Knowledge Hub</div>
+                    </div>
+                </div>
+                <div class="absolute top-0 right-0 bg-blue-500 p-4 rounded-xl shadow-lg animate-bounce"><i class="fa-solid fa-book text-white text-2xl"></i></div>
+                <div class="absolute bottom-10 left-0 bg-green-500 p-4 rounded-xl shadow-lg animate-bounce" style="animation-delay: 0.5s"><i class="fa-solid fa-chart-line text-white text-2xl"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white py-12 border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <div><h3 class="text-3xl font-bold text-ueh-blue">15K+</h3><p class="text-gray-500 text-sm">Tài liệu học tập</p></div>
+        <div><h3 class="text-3xl font-bold text-ueh-blue">50+</h3><p class="text-gray-500 text-sm">Câu lạc bộ & Đội nhóm</p></div>
+        <div><h3 class="text-3xl font-bold text-ueh-blue">24/7</h3><p class="text-gray-500 text-sm">Hỗ trợ trực tuyến</p></div>
+        <div><h3 class="text-3xl font-bold text-ueh-blue">100%</h3><p class="text-gray-500 text-sm">Kiểm duyệt nội dung</p></div>
+    </div>
+</div>
+
+<div id="featured" class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="flex justify-between items-end mb-8">
+            <div><h2 class="text-3xl font-bold text-gray-800">Tài liệu nổi bật</h2><p class="text-gray-500 mt-1">Được đánh giá cao bởi cộng đồng sinh viên</p></div>
+            <a href="{{ url_for('document_list') }}" class="text-teal-700 font-bold hover:underline">Xem tất cả <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+        <div class="grid md:grid-cols-4 gap-6">
+            {% for doc in documents[:4] %}
+            <a href="{{ url_for('document_detail', id=doc.id) }}" class="group bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-xl transition overflow-hidden flex flex-col h-full">
+                <div class="h-40 bg-gray-100 relative overflow-hidden">
+                    <img src="{{ doc.image }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    <div class="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold uppercase text-gray-600 shadow-sm">{{ doc.source_type }}</div>
+                    {% if doc.is_premium %}<div class="absolute top-2 left-2 bg-yellow-400 text-white px-2 py-1 rounded text-[10px] font-bold shadow-sm"><i class="fa-solid fa-crown"></i> PREMIUM</div>{% endif %}
+                </div>
+                <div class="p-4 flex-grow flex flex-col">
+                    <h3 class="font-bold text-gray-900 text-sm mb-2 line-clamp-2 group-hover:text-teal-700">{{ doc.title }}</h3>
+                    <div class="flex items-center text-xs text-gray-500 mb-3"><i class="fa-solid fa-folder-open mr-1"></i> {{ doc.category }}</div>
+                    <div class="mt-auto pt-3 border-t border-gray-50 flex justify-between items-center text-xs">
+                        <span class="flex items-center text-yellow-500 font-bold"><i class="fa-solid fa-star mr-1"></i> {{ doc.rating }}</span>
+                        <span><i class="fa-solid fa-download mr-1"></i> {{ doc.views }}</span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12">
+        <div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Cuộc thi đang diễn ra</h2>
+                <a href="{{ url_for('competition_list') }}" class="text-sm text-ueh-blue font-bold">Xem thêm</a>
+            </div>
+            <div class="space-y-4">
+                {% for comp in competitions[:3] %}
+                <a href="{{ url_for('competition_detail', id=comp.id) }}" class="flex gap-4 p-4 rounded-xl border border-gray-100 hover:shadow-md transition group bg-white">
+                    <img src="{{ comp.image }}" class="w-16 h-16 rounded-lg object-cover group-hover:scale-105 transition">
+                    <div>
+                        <h4 class="font-bold text-gray-900 group-hover:text-teal-700 transition">{{ comp.name }}</h4>
+                        <p class="text-xs text-gray-500 mb-1">{{ comp.organizer }}</p>
+                        <span class="text-xs font-bold {{ 'text-green-600' if 'Sắp' in comp.status else 'text-blue-600' }}">{{ comp.status }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Diễn đàn sinh viên</h2>
+            <div class="space-y-4">
+                {% for post in posts[:2] %}
+                <div class="bg-white p-4 rounded-xl shadow-sm cursor-pointer hover:shadow-md transition" onclick="window.location.href='{{ url_for('forum_detail', id=post.id) }}'">
+                    <div class="flex gap-2 mb-2">
+                        <span class="text-[10px] font-bold text-white {{ post.bg }} px-2 py-0.5 rounded">{{ post.category }}</span>
+                    </div>
+                    <h4 class="font-bold mt-1 text-sm text-gray-800 line-clamp-1">{{ post.title }}</h4>
+                    <p class="text-xs text-gray-400 mt-2 flex items-center gap-3">
+                        <span><i class="fa-solid fa-comment mr-1"></i> {{ post.comments_count }}</span>
+                        <span><i class="fa-solid fa-clock mr-1"></i> {{ post.time }}</span>
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
+            <a href="{{ url_for('forum') }}" class="block w-full bg-ueh-blue text-white text-center py-3 rounded-xl font-bold mt-6 hover:bg-ueh-teal transition shadow-md">Tham gia thảo luận</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

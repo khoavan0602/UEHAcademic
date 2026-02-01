@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="relative bg-gradient-to-r from-teal-800 to-teal-600 h-64"><div class="absolute inset-0 bg-black opacity-10"></div></div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 pb-12 relative z-10">
+    <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-100 flex flex-col md:flex-row gap-8 items-center md:items-start">
+        <div class="w-32 h-32 rounded-full border-4 border-white bg-ueh-gold flex items-center justify-center text-white text-5xl font-bold shadow-md">{{ user.avatar_initial }}</div>
+        <div class="flex-grow text-center md:text-left pt-2">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ user.name }}</h1>
+            <p class="text-gray-500 flex items-center justify-center md:justify-start gap-3"><i class="fas fa-id-card text-teal-600"></i> {{ user.mssv }} <span class="text-gray-300">|</span> <i class="fas fa-graduation-cap text-teal-600"></i> {{ user.class_name }} - {{ user.major }}</p>
+            <div class="flex flex-wrap gap-2 mt-4 justify-center md:justify-start">{% for badge in user.badges %}<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800 border border-yellow-200"><i class="fas fa-medal mr-1"></i> {{ badge }}</span>{% endfor %}</div>
+        </div>
+        <div class="text-center bg-gray-50 p-4 rounded-xl border border-gray-200 min-w-[150px]">
+            <span class="block text-3xl font-extrabold text-ueh-blue">{{ user.points }}</span>
+            <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Điểm thưởng</span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-24">
+                <nav class="flex flex-col p-2 space-y-1">
+                    <button onclick="openTab(event, 'tab-saved')" class="tab-btn active w-full text-left px-6 py-4 font-bold rounded-lg hover:bg-teal-50 hover:text-teal-700 bg-teal-50 text-teal-700 transition-all flex items-center"><i class="fas fa-bookmark w-8 text-lg"></i> Tài liệu đã lưu</button>
+                    <button onclick="openTab(event, 'tab-uploads')" class="tab-btn w-full text-left px-6 py-4 font-bold rounded-lg hover:bg-teal-50 hover:text-teal-700 text-gray-600 transition-all flex items-center"><i class="fas fa-file-upload w-8 text-lg"></i> Tài liệu đóng góp</button>
+                    <button onclick="openTab(event, 'tab-forum')" class="tab-btn w-full text-left px-6 py-4 font-bold rounded-lg hover:bg-teal-50 hover:text-teal-700 text-gray-600 transition-all flex items-center"><i class="fas fa-comments w-8 text-lg"></i> Hỏi đáp của tôi</button>
+                </nav>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3">
+            
+            <div id="tab-saved" class="tab-content block">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                    <h3 class="font-bold text-xl text-gray-900 mb-6 flex items-center border-b pb-4"><i class="fas fa-bookmark mr-3 text-ueh-blue"></i> Kho tài liệu đã lưu</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {% for doc in activity.saved_docs %}
+                        <a href="{{ url_for('document_detail', id=doc.id) }}" class="border border-gray-200 rounded-xl p-4 hover:shadow-md transition bg-white flex gap-4 group">
+                            <img src="{{ doc.image }}" class="w-20 h-24 object-cover rounded-lg shadow-sm group-hover:scale-105 transition">
+                            <div class="flex-grow flex flex-col justify-between">
+                                <div>
+                                    <h4 class="font-bold text-gray-800 text-sm mb-1 line-clamp-2 group-hover:text-ueh-blue">{{ doc.title }}</h4>
+                                    <span class="text-[10px] bg-gray-100 px-2 py-0.5 rounded font-bold text-gray-600">{{ doc.category }}</span>
+                                </div>
+                                <div class="flex justify-between items-end mt-2">
+                                    <span class="text-xs text-gray-400">Đã lưu: Hôm qua</span>
+                                    <span class="text-xs font-bold text-teal-600 group-hover:underline">Xem ngay</span>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-uploads" class="tab-content hidden">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                    <h3 class="font-bold text-xl text-gray-900 mb-6 pb-4 border-b flex items-center justify-between">
+                        <span><i class="fas fa-file-upload mr-3 text-ueh-blue"></i> Tài liệu tôi chia sẻ</span>
+                        <a href="{{ url_for('upload') }}" class="bg-yellow-500 text-white text-sm px-6 py-2 rounded-xl font-bold shadow-md hover:bg-yellow-600 flex items-center transition"><i class="fas fa-plus mr-2"></i> Đăng tải mới</a>
+                    </h3>
+                    <div class="space-y-4">
+                        {% for doc in activity.my_uploads %}
+                        <a href="{{ url_for('document_detail', id=doc.id) }}" class="border border-gray-200 rounded-xl p-5 flex justify-between items-center hover:bg-gray-50 transition group">
+                            <div class="flex gap-5 items-center">
+                                <div class="w-16 h-16 bg-teal-100 text-teal-600 rounded-xl flex items-center justify-center font-bold text-3xl group-hover:scale-110 transition"><i class="fas fa-file-alt"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 text-lg mb-1 group-hover:text-ueh-blue">{{ doc.title }}</h4>
+                                    <p class="text-sm font-medium text-gray-500"><i class="far fa-calendar-alt mr-1"></i> {{ doc.upload_date }} • <i class="fas fa-download mr-1 ml-2"></i> {{ doc.views }} lượt tải</p>
+                                </div>
+                            </div>
+                            <div class="text-right bg-yellow-50 p-3 rounded-lg border border-yellow-100">
+                                <span class="block text-xl font-extrabold text-yellow-600 flex items-center justify-end"><i class="fas fa-star mr-1"></i> {{ doc.rating }}</span>
+                                <span class="text-xs font-bold text-gray-500">{{ doc.reviews }} đánh giá</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-forum" class="tab-content hidden">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                    <h3 class="font-bold text-xl text-gray-900 mb-6 pb-4 border-b flex items-center"><i class="fas fa-comments mr-3 text-ueh-blue"></i> Câu hỏi & Thảo luận</h3>
+                    <div class="space-y-4">
+                        {% for q in activity.forum_questions %}
+                        <a href="{{ url_for('forum_detail', id=q.id) }}" class="block p-6 border border-gray-200 rounded-xl hover:border-teal-400 transition cursor-pointer group bg-white hover:shadow-sm">
+                            <div class="flex gap-2 mb-2">
+                                <span class="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-bold">{{ q.category }}</span>
+                            </div>
+                            <h4 class="font-bold text-lg text-gray-900 mb-3 group-hover:text-teal-700 group-hover:underline">{{ q.title }}</h4>
+                            <div class="flex items-center text-sm font-medium text-gray-500 gap-6">
+                                <span><i class="far fa-clock mr-2"></i> {{ q.time }}</span>
+                                <span class="flex items-center"><i class="far fa-comment-dots mr-2 text-teal-600"></i> {{ q.comments_count }} phản hồi</span>
+                                <span class="flex items-center"><i class="far fa-eye mr-2 text-teal-600"></i> {{ q.views }}</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) { tabcontent[i].style.display = "none"; }
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) { tablinks[i].className = tablinks[i].className.replace(" active bg-teal-50 text-teal-700", " text-gray-600"); }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active bg-teal-50 text-teal-700";
+    }
+</script>
+{% endblock %}

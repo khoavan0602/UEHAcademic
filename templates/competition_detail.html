@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-white min-h-screen">
+    <div class="h-64 w-full bg-gray-900 relative overflow-hidden">
+        <img src="{{ comp.image }}" class="w-full h-full object-cover opacity-60">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
+            <div class="max-w-7xl mx-auto w-full px-4 pb-8">
+                <span class="bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded uppercase mb-3 inline-block shadow-md">{{ comp.status }}</span>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-2">{{ comp.name }}</h1>
+                <div class="text-gray-300 text-sm flex items-center gap-4"><span class="flex items-center"><i class="fa-regular fa-calendar mr-2"></i> {{ comp.date }}</span><span class="flex items-center"><i class="fa-solid fa-building mr-2"></i> {{ comp.organizer }}</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 py-10 grid lg:grid-cols-3 gap-10">
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-2xl border border-gray-200 p-8 mb-10 shadow-sm">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-900 flex items-center"><i class="fa-solid fa-circle-info text-ueh-blue mr-2"></i> Thông tin chi tiết</h2>
+                    <a href="{{ url_for('forum', type='competition', ref_id=comp.id) }}" class="bg-orange-100 text-orange-700 font-bold px-4 py-2 rounded-lg text-sm hover:bg-orange-200 transition flex items-center">
+                        <i class="fa-solid fa-users-viewfinder mr-2"></i> Vào Forum Thảo Luận
+                    </a>
+                </div>
+                <p class="text-gray-600 leading-relaxed mb-6">{{ comp.description }}</p>
+                <button class="mt-4 bg-blue-600 text-white font-bold py-3 px-8 rounded-full shadow hover:bg-blue-700 transition w-full md:w-auto">Đăng ký tham gia ngay</button>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-900 mb-6 border-l-4 border-ueh-gold pl-3">Tài liệu ôn thi đề xuất</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                {% for doc in recommended_docs %}
+                <a href="{{ url_for('document_detail', id=doc.id) }}" class="flex items-start gap-4 p-4 bg-gray-50 rounded-xl hover:bg-white hover:shadow-md transition border border-gray-100 group">
+                    <img src="{{ doc.image }}" class="w-16 h-20 object-cover rounded-lg flex-shrink-0 shadow-sm">
+                    <div>
+                        <h4 class="font-bold text-sm text-gray-900 line-clamp-2 mb-1 group-hover:text-ueh-blue">{{ doc.title }}</h4>
+                        <span class="text-[10px] text-gray-500 bg-white border px-2 py-0.5 rounded uppercase">{{ doc.source_type }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="lg:col-span-1">
+             <div class="bg-gray-50 rounded-xl p-6 sticky top-24">
+                <h3 class="font-bold text-gray-900 mb-4">Timeline dự kiến</h3>
+                <ul class="border-l-2 border-gray-200 ml-2 pl-4 space-y-4">
+                    <li class="text-sm"><span class="font-bold block">Vòng loại</span> 10/04/2026</li>
+                    <li class="text-sm"><span class="font-bold block">Chung kết</span> 15/04/2026</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

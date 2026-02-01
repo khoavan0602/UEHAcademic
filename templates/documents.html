@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-gray-100 min-h-screen py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row gap-8">
+        
+        <div class="w-full lg:w-1/4">
+            <div class="bg-white rounded-xl shadow-sm p-6 sticky top-24 border border-gray-200">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-bold text-lg flex items-center"><i class="fa-solid fa-filter text-ueh-blue mr-2"></i> Bộ lọc</h3>
+                    <a href="{{ url_for('document_list') }}" class="text-xs text-gray-500 hover:text-red-500 underline">Đặt lại</a>
+                </div>
+                
+                <form action="{{ url_for('document_list') }}" method="GET">
+                    
+                    <div class="mb-6">
+                        <label class="text-xs font-bold text-gray-500 uppercase mb-2 block">Tìm kiếm môn học / tên</label>
+                        <div class="relative">
+                            <input type="text" name="q" placeholder="VD: Kinh tế vi mô..." value="{{ request.args.get('q', '') }}" 
+                                   class="w-full pl-9 pr-3 py-2 border rounded-lg text-sm focus:ring-1 focus:ring-ueh-blue outline-none transition">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-xs"></i>
+                        </div>
+                    </div>
+
+                    <div class="mb-6 border-b border-gray-100 pb-6">
+                        <label class="text-xs font-bold text-gray-500 uppercase mb-2 block">Khoa / Đơn vị</label>
+                        <select name="school" class="w-full p-2 border rounded-lg text-sm bg-gray-50 focus:bg-white transition mb-3" onchange="this.form.submit()">
+                            <option value="all">-- Tất cả Đơn vị --</option>
+                            {% for id, unit in ueh_structure.items() %}
+                            <option value="{{ id }}" {{ 'selected' if request.args.get('school') == id else '' }}>{{ unit.name }}</option>
+                            {% endfor %}
+                        </select>
+
+                        {% if request.args.get('school') and request.args.get('school') != 'all' %}
+                        <select name="major" class="w-full p-2 border rounded-lg text-sm bg-white border-ueh-teal focus:ring-1 focus:ring-ueh-blue transition">
+                            <option value="all">-- Tất cả Ngành --</option>
+                            {% for major in ueh_structure[request.args.get('school')]['majors'] %}
+                            <option value="{{ major }}" {{ 'selected' if request.args.get('major') == major else '' }}>{{ major }}</option>
+                            {% endfor %}
+                        </select>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-6 border-b border-gray-100 pb-6">
+                        <label class="text-xs font-bold text-gray-500 uppercase mb-2 block">Loại tài liệu</label>
+                        <div class="space-y-2">
+                            {% for type in doc_types %}
+                            <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer hover:text-ueh-blue">
+                                <input type="radio" name="type" value="{{ type }}" class="text-ueh-blue focus:ring-ueh-blue" 
+                                       {{ 'checked' if request.args.get('type') == type else '' }}>
+                                {{ type }}
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="text-xs font-bold text-gray-500 uppercase mb-2 block">Chi phí</label>
+                        <div class="flex gap-2">
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="cost" value="all" class="peer sr-only" {{ 'checked' if not request.args.get('cost') or request.args.get('cost') == 'all' else '' }}>
+                                <div class="text-center py-2 border rounded-lg text-xs font-bold text-gray-500 peer-checked:bg-gray-200 peer-checked:text-gray-800 transition">Tất cả</div>
+                            </label>
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="cost" value="free" class="peer sr-only" {{ 'checked' if request.args.get('cost') == 'free' else '' }}>
+                                <div class="text-center py-2 border rounded-lg text-xs font-bold text-gray-500 peer-checked:bg-green-100 peer-checked:text-green-700 peer-checked:border-green-200 transition">Miễn phí</div>
+                            </label>
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="cost" value="premium" class="peer sr-only" {{ 'checked' if request.args.get('cost') == 'premium' else '' }}>
+                                <div class="text-center py-2 border rounded-lg text-xs font-bold text-gray-500 peer-checked:bg-yellow-100 peer-checked:text-yellow-700 peer-checked:border-yellow-200 transition">Có phí</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-ueh-blue text-white font-bold py-3 rounded-xl shadow-md hover:bg-ueh-teal transition">Áp dụng bộ lọc</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="w-full lg:w-3/4">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-2xl font-bold text-gray-800">Thư viện tài liệu</h1>
+                <span class="text-sm text-gray-500 font-medium bg-white px-3 py-1 rounded-full border shadow-sm">{{ documents|length }} kết quả</span>
+            </div>
+
+            <div class="grid gap-4">
+                {% for doc in documents %}
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-5 hover:shadow-lg transition group relative overflow-hidden">
+                    
+                    {% if doc.is_premium %}
+                    <div class="absolute top-0 right-0 bg-yellow-400 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm z-10">
+                        <i class="fa-solid fa-crown mr-1"></i> PREMIUM
+                    </div>
+                    {% else %}
+                    <div class="absolute top-0 right-0 bg-green-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl shadow-sm z-10">
+                        FREE
+                    </div>
+                    {% endif %}
+
+                    <div class="w-full sm:w-36 h-36 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                        <img src="{{ doc.image }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    </div>
+
+                    <div class="flex-grow flex flex-col justify-between py-1">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase border {{ 'bg-blue-50 text-blue-700 border-blue-100' if doc.doc_type == 'Slide bài giảng' else 'bg-gray-50 text-gray-600 border-gray-200' }}">
+                                    {{ doc.doc_type }}
+                                </span>
+                                <span class="text-xs text-gray-400">{{ doc.subject }}</span>
+                            </div>
+                            <h3 class="font-bold text-lg text-gray-900 mb-1 group-hover:text-ueh-blue transition leading-tight">
+                                <a href="{{ url_for('document_detail', id=doc.id) }}">{{ doc.title }}</a>
+                            </h3>
+                            <p class="text-xs text-gray-500 mb-2">
+                                <i class="fa-solid fa-school mr-1"></i> {{ doc.major }}
+                            </p>
+                            <p class="text-sm text-gray-600 line-clamp-2">{{ doc.description }}</p>
+                        </div>
+                        
+                        <div class="flex items-center gap-4 text-xs font-medium text-gray-400 mt-2">
+                            <span class="flex items-center text-yellow-500"><i class="fa-solid fa-star mr-1"></i> {{ doc.rating }}</span>
+                            <span><i class="fa-solid fa-download mr-1"></i> {{ doc.views }}</span>
+                            <span><i class="fa-solid fa-user mr-1"></i> {{ doc.author }}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col justify-center min-w-[100px] border-l border-gray-50 pl-4">
+                        <a href="{{ url_for('document_detail', id=doc.id) }}" class="bg-gray-100 text-gray-700 text-center py-2 rounded-lg font-bold text-sm hover:bg-ueh-blue hover:text-white transition shadow-sm mb-2">
+                            Xem ngay
+                        </a>
+                        <button class="text-gray-400 hover:text-ueh-gold text-center transition"><i class="fa-regular fa-bookmark"></i></button>
+                    </div>
+                </div>
+                {% else %}
+                <div class="flex flex-col items-center justify-center py-16 bg-white rounded-xl border border-dashed border-gray-300">
+                    <i class="fa-regular fa-folder-open text-4xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500">Không tìm thấy tài liệu phù hợp với bộ lọc.</p>
+                    <a href="{{ url_for('document_list') }}" class="mt-4 text-ueh-blue font-bold text-sm hover:underline">Xóa bộ lọc</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
