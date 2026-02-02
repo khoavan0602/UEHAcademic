@@ -3,6 +3,16 @@ import datetime
 
 app = Flask(__name__)
 app.secret_key = 'ueh_academic_final_fix_v2026'
+# ==========================================
+# USERS GIẢ LẬP (LOGIN DEMO – CHO RENDER)
+# ==========================================
+users = {
+    "student@ueh.edu.vn": {
+        "email": "student@ueh.edu.vn",
+        "password": "123456",
+        "name": "Nguyễn Trọng N"
+    }
+}
 
 # ==========================================
 # 1. DỮ LIỆU CẤU TRÚC UEH (Dùng cho Documents & Register)
@@ -127,9 +137,27 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        session['user'] = users['student@ueh.edu.vn']
-        return redirect(url_for('home'))
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        # Check thiếu dữ liệu
+        if not email or not password:
+            flash("Vui lòng nhập email và mật khẩu", "error")
+            return redirect(url_for('login'))
+
+        user = users.get(email)
+
+        # Check login
+        if user and user['password'] == password:
+            session['user'] = user
+            flash("Đăng nhập thành công!", "success")
+            return redirect(url_for('home'))
+        else:
+            flash("Email hoặc mật khẩu không đúng", "error")
+            return redirect(url_for('login'))
+
     return render_template('login.html')
+
 
 @app.route('/logout')
 def logout():
@@ -232,6 +260,5 @@ def profile():
 @app.route('/upload')
 def upload():
     return render_template('upload.html', user=session.get('user'), ueh_structure=ueh_structure)
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
